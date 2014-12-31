@@ -2,7 +2,9 @@ SRC=.
 ODIR=output
 PFLAGS=--standalone --toc --mathjax
 
-_OBJ=Intro.html About.html
+_OBJ=About.html \
+	 0-Intro.html \
+	 1-Background.html
 OBJ=$(patsubst %,$(ODIR)/%,$(_OBJ))
 
 all: compile
