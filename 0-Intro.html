@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/skeleton.css">
+  <link rel="stylesheet" href="css/custom.css">
+</head>
+<body>
+<div class='container'>
+<nav id="TOC" class="toc">
+<ul>
+<li><a href="#introduction-to-cryptography">Introduction to Cryptography</a><ul>
+<li><a href="#a-brief-summary-of-cryptography">A brief summary of cryptography</a></li>
+<li><a href="#a-briefer-summary-of-cryptography">A briefer summary of cryptography</a></li>
+</ul></li>
+</ul>
+</nav>
+<article>
+  <h1 id="introduction-to-cryptography">Introduction to Cryptography</h1>
+  <blockquote>
+  <p>Cryptography (or cryptology; from Greek κρυπτός kryptós, &quot;hidden, secret&quot;; and γράφειν graphein, &quot;writing&quot;, or -λογία -logia, &quot;study&quot;, respectively) is the practice and study of techniques for secure communication in the presence of third parties (called adversaries). -- <a href="http://en.wikipedia.org/wiki/Cryptography">Wikipedia entry on cryptography</a></p>
+  </blockquote>
+  <p>Cryptography has many applications in day-to-day life, from keeping your <a href="http://en.wikipedia.org/wiki/Transport_Layer_Security">Internet communications secret</a> to securing the <a href="http://en.wikipedia.org/wiki/EMV">credit card transactions</a> you make at a physical store. It serves as the foundation of many systems that perform authentication and keep data secure.</p>
+  <p>Cryptography is an interdisciplinary topic. It is a crucial part of security but is not all of it. It is a fun application of mathematics (much of public key cryptography relies on number theory) and a fun application of theoretical computer science.</p>
+  <p>This website is intended to be an extended introduction to applied cryptography. While a strong background in mathematics, in particular number theory and probability, will be helpful, it is not required as we will cover much of the necessary mathematics. An introductory background in computer science (knowing about P and NP) will be assumed.</p>
+  <h2 id="a-brief-summary-of-cryptography">A brief summary of cryptography</h2>
+  <blockquote>
+  <p>But I don't have time to read this entire site! -- You (but hopefully not)</p>
+  </blockquote>
+  <p>If you just want a quick reference:</p>
+  <ul>
+  <li>Never implement your own crypto.</li>
+  <li>Don't use insecure PRNGs like <code>rand()</code>, <code>srand()</code>, <code>java.util.Random</code>. Use <a href="http://en.wikipedia.org/wiki/Cryptographically_secure_pseudorandom_number_generator">these instead</a></li>
+  <li>Don't use <a href="http://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Electronic_codebook_.28ECB.29">ECB</a> mode block cipher encryption. Use CBC or GCM instead. However, beware the <a href="http://en.wikipedia.org/wiki/Padding_oracle_attack">padding oracle attack</a>.</li>
+  <li>Always use <a href="http://en.wikipedia.org/wiki/Initialization_vector">initialization vectors</a> in your block ciphers. It's good for you.</li>
+  <li>Textbook RSA is insecure. Use RSA with <a href="http://en.wikipedia.org/wiki/Optimal_asymmetric_encryption_padding">OAEP padding</a>.</li>
+  <li>Never implement your own crypto.</li>
+  </ul>
+  <h2 id="a-briefer-summary-of-cryptography">A briefer summary of cryptography</h2>
+  <p>Never implement your own crypto.</p>
+  <p>Unless it's for your own edification and you promise to never use it in production.</p>
+</article>
+</div>
+</body>
+</html>

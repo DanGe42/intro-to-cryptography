@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Background</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/skeleton.css">
+  <link rel="stylesheet" href="css/custom.css">
+  <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+</head>
+<body>
+<div class='container'>
+<header>
+<h1 class="title">Background</h1>
+</header>
+<section class='overview'>
+  <p>For context on modern cryptography, we start with some historical background on cryptography.</p>
+</section>
+<nav id="TOC" class="toc">
+<ul>
+<li><a href="#some-notation">Some notation</a></li>
+<li><a href="#history">History</a><ul>
+<li><a href="#caesar-cipher">Caesar cipher</a></li>
+<li><a href="#intermission">Intermission</a></li>
+<li><a href="#mono-alphabetic-cipher">Mono-alphabetic cipher</a></li>
+<li><a href="#vigenère-cipher">Vigenère cipher</a></li>
+</ul></li>
+<li><a href="#one-time-pad">One-time pad</a><ul>
+<li><a href="#security">Security</a></li>
+<li><a href="#otp-security">OTP security</a></li>
+<li><a href="#conclusion">Conclusion</a></li>
+</ul></li>
+</ul>
+</nav>
+<article>
+  <div class="jax-macros">
+  <span class="math">\[
+  \newcommand\given[1][]{\:#1\vert\:}
+  \]</span>
+  </div>
+  <h2 id="some-notation">Some notation</h2>
+  <p>Here we start with some basic syntax that we will use throughout this site. Alice wants to send a message to Bob.</p>
+  <ul>
+  <li><span class="math">\(m\)</span>: The plaintext, unencrypted message</li>
+  <li><span class="math">\(k\)</span>: The secret key that both Alice and Bob have agreed to use to encrypt and decrypt the messages they exchange.</li>
+  <li><span class="math">\(c\)</span>: The encrypted message, or ciphertext.</li>
+  <li><span class="math">\(c = Enc_k(m)\)</span>: The encryption function that encrypts plaintext <span class="math">\(m\)</span> with secret key <span class="math">\(k\)</span> to produce ciphertext <span class="math">\(c\)</span>.</li>
+  <li><span class="math">\(m = Dec_k(c)\)</span>: The decryption function that decrypts ciphertext <span class="math">\(c\)</span> with secret key <span class="math">\(k\)</span> to produce plaintext <span class="math">\(m\)</span>.</li>
+  </ul>
+  <!-- TODO diagram -->
+  <p>A <em>cryptosystem</em> is defined by its <span class="math">\(Enc_k(\cdot)\)</span> and <span class="math">\(Dec_k(\cdot)\)</span> functions. It is also defined by its <span class="math">\(Gen\)</span> function, which defines how keys are generated. The correctness property of a cryptosystem is satisfied if <span class="math">\(Dec_k(Enc_k(m)) = m\)</span>.</p>
+  <h2 id="history">History</h2>
+  <h3 id="caesar-cipher">Caesar cipher</h3>
+  <p>The <a href="http://en.wikipedia.org/wiki/Caesar_cipher">Caesar cipher</a> is one of the simplest cryptosystems. To encrypt a message, we apply a constant shift to each character. To decrypt a ciphertext, we apply the opposite shift to each character.</p>
+  <pre><code>k = 3
+  plain:  a b c d ... z
+  cipher: d e f g ... c</code></pre>
+  <p>To formalize this, we generate the secret key <span class="math">\(k\)</span> by choosing a random natural number in the range from 1 to 26 (inclusive). This can be otherwise written as <span class="math">\(k \in \{1..26\}\)</span>. For the <span class="math">\(i\)</span>th character, encryption is defined as <span class="math">\(c_i = Enc_k(m_i) = m_i + k\)</span>, and decryption is defined as <span class="math">\(m_i = Dec_k(c_i) = c_i - k\)</span>.</p>
+  <h4 id="cryptanalysis">Cryptanalysis</h4>
+  <p>The <em>cryptanalysis</em> of a cryptosystem is the analysis of a cryptosystem to discover hidden properties about it, most often to break its security. The cryptanalysis of the Caesar cipher is very straightforward. Because the size of our search space is fairly small (26 if limited to the English alphabet), we can trivially brute force every possible key (constant shift) and see which one results in a non-gibberish message.</p>
+  <h3 id="intermission">Intermission</h3>
+  <p>It is a good idea at this point to introduce <a href="http://en.wikipedia.org/wiki/Kerckhoffs%27s_principle">Kerckhoff's principle</a>. In contrast to the principle of security through obscurity, it should be okay for an encryption scheme to be public knowledge, as long as the key remains a secret. A modern interpretation of this principle is that cryptographic algorithms should be public, standardized, and scrutinized in public.</p>
+  <p>For our Caesar cipher, security of the scheme relies on the adversary not knowing how a message is encrypted.</p>
+  <p>Another key idea to introduce at this point is the &quot;sufficient key space principle&quot;, which states that any secure encryption scheme should not be vulnerable to an exhaustive search over key space. Note that, while this is a necessary property for a cryptosystem, it is not sufficient for security.</p>
+  <p>Once an adversary knows that a message is encrypted with a Caesar cipher, all he or she has to do is to enumerate every possible key and try them all to decrypt the message. Since the key space is not very large, it takes a very short amount of time to break the cipher.</p>
+  <p>So, why do we even discuss such trivially broken ciphers? Not only do they serve as a foundation for our discussion but also that they are surprisingly still in use today. In 2006, the Mafia boss Bernardo Provenzano was captured after the police intercepted messages written in an easily cracked code (which used a Caesar cipher!) between him and other Mafia members.<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> In 2011, authorities were able to stop Rajib Karim from blowing up British Airways planes because he relied on a Caesar cipher to communicated with an al-Qaeda leader. He rejected using modern cryptography because &quot;non-believers know about it so it must be less secure&quot;.<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a></p>
+  <h3 id="mono-alphabetic-cipher">Mono-alphabetic cipher</h3>
+  <p>A simple improvement to the Caesar cipher that significantly (on a relative scale) improves its security is to not use a constant shift but to freely map each letter in the alphabet to a different letter in the alphabet. This is commonly used in the <a href="http://en.wikipedia.org/wiki/Cryptogram">cryptography puzzles</a> you find in newspapers.</p>
+  <pre><code>plain:  a b c d ...
+  cipher: X E U A ...</code></pre>
+  <p>This change increases the key space, assuming our 26-letter English alphabet, from 26 to <span class="math">\(26!\)</span>, which is approximately <span class="math">\(2^{88}\)</span>. (Note that the key space is not <span class="math">\(26^{26}\)</span> because we have to ensure that multiple plaintext letters do not map to the same letter in ciphertext. To make this further clear, imagine that we have a two-letter alphabet with <em>a</em> and <em>b</em>. If we map plaintext <em>a</em> to ciphertext <em>b</em>, then we have no choice but to map plaintext <em>b</em> to ciphertext <em>a</em>. Otherwise, we will have trouble decrypting the ciphertext.)</p>
+  <h4 id="cryptanalysis-1">Cryptanalysis</h4>
+  <p>To solve a cryptogram, one normally looks for the letters that appear the most common and surmises that these letters must correspond to letters that most commonly appear in English text. Cryptanalysis of a mono-alphabetic cipher is similar to the method one would employ to solve a cryptogram: <a href="http://en.wikipedia.org/wiki/Frequency_analysis">frequency analysis</a> of characters in the ciphertext.</p>
+  <h3 id="vigenère-cipher">Vigenère cipher</h3>
+  <p>An improvement to the mono-alphabetic cipher is the poly-alphabetic shift cipher known as the <a href="http://en.wikipedia.org/wiki/Vigen%C3%A8re_cipher">Vigenère cipher</a>. This cipher was invented in 1553 by Giovanni Battista Bellaso, but is often attributed to French diplomat Blaise de Vigenère.</p>
+  <p>In this cryptosystem, we pick a key of some length, encode a length of plaintext with it, and then repeat the process for the next length of plaintext. This is illustrated below:</p>
+  <pre><code>k = run
+  plain:  TOBEORNOTTOBE
+  key:    runrunrunrunr
+  cipher: KIOVIEEIGKIOV</code></pre>
+  <h4 id="cryptanalysis-2">Cryptanalysis</h4>
+  <p>This cipher remain unbroken for a long time because it circumvents naïve frequency analysis. Let's see how one would perform cryptanalysis of this scheme.</p>
+  <!-- TODO: I probably don't know what I'm talking about here -->
+  <p>Suppose we know the length of the key, <span class="math">\(n\)</span>. We break the cipher text into chunks of length <span class="math">\(n\)</span>. For each chunk, we can solve it as a Caesar cipher.</p>
+  <p>In 1863, Friedrich Kasiski published a method to find <span class="math">\(n\)</span>. The essence of the method is to observe that repeated strings in the plaintext are eventually encrypted in the same way because of the repeating nature of the key. If we find such a repeating sequence in the ciphertext then we know that the key length is likely a multiple of <span class="math">\(n\)</span>.</p>
+  <p>What if we used a key the length of the message? We now have the one-time pad.</p>
+  <h2 id="one-time-pad">One-time pad</h2>
+  <p>The one-time pad (OTP) is an encryption scheme that takes a key that is the length of the message and XORs (bitwise exclusive-or) it with the message to produce the ciphertext.</p>
+  <p>We will introduce some notation that we will be using from here on:</p>
+  <ul>
+  <li><span class="math">\(a \in_R A\)</span>: An element <span class="math">\(a\)</span> picked randomly from the set <span class="math">\(A\)</span>.</li>
+  <li><span class="math">\(\oplus\)</span>: <a href="http://en.wikipedia.org/wiki/Exclusive_or">XOR</a></li>
+  </ul>
+  <p>For a quick refresher on some important properties of the bitwise XOR:</p>
+  <ul>
+  <li><span class="math">\(a \oplus b = b \oplus a\)</span></li>
+  <li><span class="math">\(a \oplus (b \oplus c) = (a \oplus b) \oplus c\)</span></li>
+  <li><span class="math">\(a \oplus a = 0\)</span></li>
+  <li><span class="math">\(a \oplus 0 = a\)</span></li>
+  <li><span class="math">\(a \oplus 1 = \neg a\)</span></li>
+  <li><span class="math">\(a \oplus b \oplus a = a \oplus a \oplus b = b\)</span></li>
+  </ul>
+  <p>The OTP cryptosystem is defined as thus. Given a binary message of length <span class="math">\(n\)</span> (<span class="math">\(m \in \{0, 1\}^n\)</span>):</p>
+  <ul>
+  <li>Key generation (<span class="math">\(Gen\)</span>): <span class="math">\(k \in_R \{0, 1\}^n\)</span></li>
+  <li>Encryption (<span class="math">\(Enc\)</span>): <span class="math">\(Enc_k(m) = k \oplus m = c\)</span></li>
+  <li>Decryption (<span class="math">\(Dec\)</span>): <span class="math">\(Dec_k(c) = c \oplus k = m\)</span></li>
+  </ul>
+  <h3 id="security">Security</h3>
+  <p>Is the one-time pad &quot;secure&quot;? For that matter, what does &quot;secure&quot; even mean? It could have several combination of these meanings:</p>
+  <ul>
+  <li>No adversary can compute secret key from ciphertext</li>
+  <li>No adversary can compute plaintext from ciphertext</li>
+  <li>No adversary can determine a character of plaintext</li>
+  <li>No adversary can compute any meaningful information</li>
+  <li>No adversary can compute an function of plaintext from ciphertext</li>
+  </ul>
+  <h4 id="perfect-secrecy">Perfect secrecy</h4>
+  <p>To formalize &quot;security&quot;, we begin by defining properties that we want our encryption scheme to have. One property that we want our scheme to have is &quot;perfect secrecy&quot;, which we will define as follows. Say we have a ciphertext and we decrypt it to some plaintext message. The probability that this ciphertext decrypts to this specific message is equal to the probability that it decrypts to something else.</p>
+  <p>Some notation first:</p>
+  <ul>
+  <li><span class="math">\(M\)</span>: <a href="http://en.wikipedia.org/wiki/Random_variable">Random variable</a> representing the space of plaintext messages</li>
+  <li><span class="math">\(C\)</span>: Random variable representing the space of ciphertext messages</li>
+  <li><span class="math">\(Pr[\cdot]\)</span>: The probability of an event</li>
+  </ul>
+  <p>Formally, for every probability distribution over <span class="math">\(\{m\}\)</span> (the set of all messages):</p>
+  <p><span class="math">\[ \forall m \in \{m\}, \forall c \in \{c\}, \,
+  Pr[M = m \given C = c] = Pr[M = m]\]</span></p>
+  <p>Or equivalently...</p>
+  <p><span class="math">\[Pr[C = c \given M = m] = Pr[C = c]\]</span></p>
+  <p>If you know your way around probability, you might recognize that this is statistical independence:</p>
+  <p><span class="math">\[ P(A \cap B) = P(A)P(B) \Leftrightarrow P(A \given B) = P(A)
+  \Leftrightarrow P(B \given A) = P(B)\]</span></p>
+  <p><strong>Lemma</strong>: We also want our encryption scheme to have the property of <em>perfect indistinguishability</em>. This basically means that ciphertext output by our encryption scheme is indistinguishable from random noise. This follows directly from our definition of perfect secrecy.</p>
+  <p>Formally, for every probability distribution over <span class="math">\(\{m\}\)</span>:</p>
+  <p><span class="math">\[ \forall m_0, m_1 \in \{m\}, \forall c \in \{c\}, \,
+  Pr[C = c \given M = m_0] = Pr[C = c \given M = m_1]\]</span></p>
+  <div class="proof">
+  <p><strong>Proof</strong>: We first prove that perfect secrecy implies perfect indistinguishability. Take two messages <span class="math">\(m_0\)</span> and <span class="math">\(m_1\)</span>. Via our perfect secrecy:</p>
+  <ol type="1">
+  <li><span class="math">\(Pr[C = c \given M = m_0] = P[C = c]\)</span></li>
+  <li><span class="math">\(Pr[C = c \given M = m_1] = P[C = c]\)</span></li>
+  </ol>
+  <p>Therefore, <span class="math">\(Pr[C = c \given M = m_0] = Pr[C = c \given M = m_1]\)</span>.</p>
+  <p>We now show that perfect indistinguishability implies perfect secrecy. Given a probability distribution over <span class="math">\(\{m\}\)</span>, and an arbitrary <span class="math">\(m_0\)</span> and <span class="math">\(c\)</span>:</p>
+  <p><span class="math">\[
+  \begin{align*}
+  Pr[C = c] &amp;= \sum_m Pr[C = c \given M = m] \cdot Pr[M = m] \\
+            &amp;= \sum_m Pr[C = c \given M = m_0] \cdot Pr[M = m] \\
+            &amp;= Pr[C = c \given M = m_0] \cdot \sum_m Pr[M = m] \\
+            &amp;= Pr[C = c \given M = m_0] \cdot 1 \\
+            &amp;= Pr[C = c \given M = m_0]
+  \end{align*}
+  \]</span></p>
+  <span class="math">\(\square\)</span>
+  </div>
+  <h3 id="otp-security">OTP security</h3>
+  <p>OTP is perfectly secret. This might not be immediately obvious (and we are going to prove it), but some intuition might help. Say that you're given <span class="math">\(c_i\)</span> (the <span class="math">\(i\)</span>th bit in the ciphertext <span class="math">\(c\)</span>). You know that the corresponding <span class="math">\(k_i\)</span> could be either 0 or 1 with equal probability. Thus, you have a 50% chance of guessing the plaintext <span class="math">\(m_i\)</span> correctly.</p>
+  <p>Let's extend this intuition to the entire message: you know that roughly 50% of <span class="math">\(k\)</span> is 1s and the other 50% is 0s. Thus, this means that roughly 50% of the plaintext has had its bits flipped and the other 50% of the bits not flipped. While this initially sounds like you have the advantage, you have to guess which 50% of the ciphertext bits were actually flipped. Thus, the probability that you guess all of these bits correctly is <span class="math">\(\frac{1}{2^l}\)</span>, where <span class="math">\(l\)</span> is the length of the message.</p>
+  <p>More formally, here is our proof that OTP is perfectly secret.</p>
+  <div class="proof">
+  <p><strong>Proof</strong>: Given key <span class="math">\(k\)</span>, message <span class="math">\(m\)</span>, ciphertext <span class="math">\(c\)</span>, and length of the message/ciphertext <span class="math">\(l\)</span>:</p>
+  <p><span class="math">\[
+  \begin{align*}
+  Pr[C = c \given M = m] &amp;= Pr[M \oplus k = c \given M = m] \\
+                         &amp;= Pr[m \oplus k = c] \\
+                         &amp;= Pr[k = c \oplus m] \\
+                         &amp;= \frac{1}{2^l}
+  \end{align*}
+  \]</span></p>
+  <p>For any <span class="math">\(m_0\)</span> and <span class="math">\(m_1\)</span>:</p>
+  <p><span class="math">\[Pr[C = c \given M = m_0] = \frac{1}{2^l} = Pr[C = c \given M = m_1]\]</span></p>
+  <span class="math">\(\square\)</span>
+  </div>
+  <h3 id="conclusion">Conclusion</h3>
+  <p>In the above sections, we have shown that OTP is perfectly secret, which is probably enough for our definition of perfect security. So, we are done.</p>
+  <p>...or are we...</p>
+  <p>As it turns out, OTP is incredibly impractical to use. One problem that must be solved for a cryptosystem to be useful is key distribution; two parties that desire to communicate must be able to agree on what key to use. OTP key distribution is difficult; parties must agree on what keys to use before all future communications in order to avoid communicating the key, unencrypted, in the clear.</p>
+  <p>In addition, the length of the key must be at least the length of the message. This forces both parties to limit their message lengths to the length of the key. As a side note...</p>
+  <p><strong>Theorem</strong>: <span class="math">\((Gen, Enc, Dec)\)</span> be a perfectly secret encryption scheme. This implies that <span class="math">\(|K| \geq |M|\)</span>, where <span class="math">\(K = \{k\}\)</span> and <span class="math">\(M = \{m\}\)</span> (i.e. the lengths of the keys are at least the lengths of the messages).</p>
+  <!-- TODO: this might not be correct -->
+  <!--
+  <div class='proof'>
+  **Proof**: We prove this by the contrapositive: if $|K| < |M|$, then our
+  scheme is not perfectly secure.
+  
+  Fix a uniform distribution over $M$.
+  Let $M(c) = \{m : m = Dec_k(c) \text{ for some } k \in K\}$.
+  If $|M(c)| \leq |k|$, then there must exist some $m' \in M$ such that
+  $m' \notin M(c)$. Thus, $Pr[M = m' \given C = c] = 0 \neq Pr[M = m']$.
+  $\square$
+  </div>
+  -->
+  <p>And finally, OTP keys must not be reused to encrypt multiple messages. Doing so will compromise the security of the messages and the key, as an attacker will know that a key is correct if it reveals both messages correctly.</p>
+  <section class="footnotes">
+  <hr />
+  <ol>
+  <li id="fn1"><p><a href="http://itre.cis.upenn.edu/myl/languagelog/archives/003049.html">Language Log: The Provenzano Code</a><a href="#fnref1">↩</a></p></li>
+  <li id="fn2"><p><a href="http://www.theregister.co.uk/2011/03/22/ba_jihadist_trial_sentencing/">BA jihadist relied on Jesus-era encryption</a><a href="#fnref2">↩</a></p></li>
+  </ol>
+  </section>
+</article>
+</div>
+</body>
+</html>
