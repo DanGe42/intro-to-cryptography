@@ -1,0 +1,37 @@
+.jax-macros {
+  display: none;
+}
+
+.toc {
+  display: none;
+}
+
+.container h2 {
+  border-bottom: 1px solid #999;
+}
+
+.footnotes p {
+  margin-bottom: 0;
+}
+
+/* Larger than phablet */
+@media (min-width: 550px) {
+  .toc {
+    border: 1px solid #aaa;
+    display: table;
+    margin-right: 1rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+  }
+
+  .toc li {
+    margin-top: 0.125rem;
+    margin-bottom: 0.125rem;
+  }
+
+  .toc ul {
+    list-style: none;
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+}

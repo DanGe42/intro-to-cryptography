@@ -1,11 +1,18 @@
+---
+title: Background
+---
+
+<div class="jax-macros">
 $$
 \newcommand\given[1][]{\:#1\vert\:}
 $$
+</div>
 
-# Background
-
-For context on modern cryptography, we start with some historical background
-on cryptography. But first, some notation.
+---
+overview: |
+    For context on modern cryptography, we start with some historical
+    background on cryptography.
+---
 
 ## Some notation
 
@@ -209,6 +216,7 @@ ciphertext decrypts to this specific message is equal to the probability that
 it decrypts to something else.
 
 Some notation first:
+
 * $M$: [Random variable](http://en.wikipedia.org/wiki/Random_variable)
   representing the space of plaintext messages
 * $C$: Random variable representing the space of ciphertext messages
