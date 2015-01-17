@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Some mathematical background</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/skeleton.css">
+  <link rel="stylesheet" href="css/custom.css">
+  <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+</head>
+<body>
+<div class='container'>
+<header>
+<h1 class="title">Some mathematical background</h1>
+</header>
+<section class='overview'>
+  <p>Probability serves as an important foundation of the study of cryptography. Here, we will review a few fundamental concepts in probability.</p>
+</section>
+<nav id="TOC" class="toc">
+<ul>
+<li><a href="#probability">Probability</a><ul>
+<li><a href="#sample-spaces">Sample spaces</a></li>
+<li><a href="#conjunctions-and-disjunctions">Conjunctions and disjunctions</a></li>
+<li><a href="#conditional-probability">Conditional probability</a></li>
+<li><a href="#binomial-distribution">Binomial distribution</a></li>
+</ul></li>
+<li><a href="#expectations">Expectations</a></li>
+<li><a href="#entropy">Entropy</a><ul>
+<li><a href="#jensens-inequality">Jensen's Inequality</a></li>
+</ul></li>
+<li><a href="#statistical-distance">Statistical distance</a></li>
+<li><a href="#algorithmic-distinguisher">Algorithmic distinguisher</a></li>
+</ul>
+</nav>
+<article>
+  <div class="jax-macros">
+  <span class="math">\[
+  \newcommand\given[1][]{\:#1\vert\:}
+  \]</span>
+  </div>
+  <!-- TODO finish this entire page -->
+  <h2 id="probability">Probability</h2>
+  <!-- TODO: A lot of this might not be explained very well. Teaching probability
+    is hard. -->
+  <p><strong>Probability</strong> represents the likelihood that a certain event occurs. More formally, it is a function that maps a sample space to a set of outcomes.</p>
+  <h3 id="sample-spaces">Sample spaces</h3>
+  <p>Our notation will be as follows:</p>
+  <ul>
+  <li><span class="math">\(\omega\)</span>: An event</li>
+  <li><span class="math">\(\Omega\)</span>: A sample space</li>
+  <li><span class="math">\(Pr(\omega)\)</span>: The probability that event <span class="math">\(\omega\)</span> occurs. Note that the constraint <span class="math">\(0 \leq Pr(\omega) \leq 1\)</span> must be satisfied.</li>
+  </ul>
+  <p>As an example, let's look at a simple toss of a fair coin. The sample space is <span class="math">\(\Omega = \{H, T\}\)</span> (where <span class="math">\(H\)</span> is heads and <span class="math">\(T\)</span> is tails). It holds that <span class="math">\(Pr(H) = Pr(T) = \frac{1}[2}\)</span>. To extend on this, if we toss two fair coins, our sample space becomes <span class="math">\(\Omega = \{HH, HT, TH, TT\}\)</span>.</p>
+  <p>The sum of all probabilities over a sample space must add up to 1. In other words, <span class="math">\(\sum_{\omega \in \Omega} Pr(\omega) = 1\)</span>.</p>
+  <p>If <span class="math">\(A \subseteq \Omega\)</span>, then the set of events <span class="math">\(A\)</span> is considered a <strong>sample subset</strong> of sample space <span class="math">\(\Omega\)</span>. It follows that <span class="math">\(Pr(A) = \sum_{\omega \in A} Pr(\omega)\)</span>. For example, consider a six-sided dice roll. Its sample space is <span class="math">\(\Omega = \{1..6\}\)</span>. Let <span class="math">\(A\)</span> be the subset of odd numbers in <span class="math">\(\Omega\)</span> (i.e. <span class="math">\(A = \{1, 3, 5\}\)</span>). It follows that <span class="math">\(Pr(A) = \sum_{\omega \in \{1, 3, 5\}} Pr(\omega) = \frac{1}{2}\)</span>.</p>
+  <h3 id="conjunctions-and-disjunctions">Conjunctions and disjunctions</h3>
+  <p>A <strong>disjunction</strong> is defined as <span class="math">\(Pr(A \wedge B)\)</span>. This represents the probability that both an event from <span class="math">\(A\)</span> and an event from <span class="math">\(B\)</span> occur.</p>
+  <p>A <strong>conjunction</strong> of probability spaces is defined as <span class="math">\(Pr(A \vee B) = Pr(A) + Pr(B) - Pr(A \wedge B)\)</span>. This represents the probability that either an event from <span class="math">\(A\)</span> or an event <span class="math">\(B\)</span> occurs (or both). We subtract off the <span class="math">\(Pr(A \wedge B)\)</span> to avoid double-counting. It holds that <span class="math">\(Pr(A \vee B) \leq Pr(A) + Pr(B)\)</span>, where <span class="math">\(Pr(A) + Pr(B)\)</span> is called the &quot;union bound&quot;.</p>
+  <p>Events <span class="math">\(A\)</span> and <span class="math">\(B\)</span> are <strong>independent</strong> if and only if <span class="math">\(Pr(A \wedge B) = Pr(A) \cdot Pr(B)\)</span>.</p>
+  <h3 id="conditional-probability">Conditional probability</h3>
+  <p>The probability of an event <span class="math">\(A\)</span> occurring, given that event <span class="math">\(B\)</span> occurs, is written as <span class="math">\(Pr(A \given B)\)</span>. It is defined as <span class="math">\(\frac{Pr(A \wedge B)}{Pr(B)}\)</span>.</p>
+  <p>Bayes Theorem holds that:</p>
+  <p><span class="math">\[Pr(A \given B) = \frac{Pr(A) \cdot Pr(B \given A)}{Pr(B)}\]</span></p>
+  <h3 id="binomial-distribution">Binomial distribution</h3>
+  <p>The <a href="http://en.wikipedia.org/wiki/Binomial_distribution">binomial distribution</a> is a probability distribution of a number of independent binary (yes/no) experiments. Given a random variable <span class="math">\(X\)</span> and the probability the event <span class="math">\(k\)</span> being <span class="math">\(Pr(k) = p\)</span>, the binomial distribution is defined:</p>
+  <p><span class="math">\[ Pr(X = k) = \binom{n}{k} p^k (1 - p)^{n-k} \]</span></p>
+  <h2 id="expectations">Expectations</h2>
+  <h2 id="entropy">Entropy</h2>
+  <h3 id="jensens-inequality">Jensen's Inequality</h3>
+  <h2 id="statistical-distance">Statistical distance</h2>
+  <h2 id="algorithmic-distinguisher">Algorithmic distinguisher</h2>
+</article>
+</div>
+</body>
+</html>
