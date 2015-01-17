@@ -10,7 +10,8 @@ PFLAGS=--toc --mathjax \
 
 _OBJ=About.html \
 	 0-Intro.html \
-	 1-Background.html
+	 1-Background.html \
+	 2-Probability.html
 OBJ=$(patsubst %,$(ODIR)/%,$(_OBJ))
 
 _CSS=normalize.css \
@@ -19,7 +20,7 @@ CSS=$(patsubst %,$(CSSDIR)/%,$(_CSS))
 
 all: compile
 
-$(ODIR)/%.html: $(SRC)/%.md $(TEMPLATE) $(CSS)
+$(ODIR)/%.html: $(SRC)/%.md $(TEMPLATE)
 	mkdir -p $(ODIR)
 	pandoc --from=markdown --to=html5 $(PFLAGS) -o $@ $<
 
