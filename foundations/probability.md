@@ -1,18 +1,11 @@
----
-title: Some mathematical background
----
+{% extends "base.md" %}
 
-<div class="jax-macros">
-$$
-\newcommand\given[1][]{\:#1\vert\:}
-$$
-</div>
+{% block article %}
 
----
-overview: |
-    Probability serves as an important foundation of the study of cryptography.
-    Here, we will review a few fundamental concepts in probability.
----
+# Probability
+
+Probability serves as an important foundation of the study of cryptography.
+Here, we will review a few fundamental concepts in probability.
 
 <!-- TODO finish this entire page -->
 
@@ -89,3 +82,5 @@ $$ Pr(X = k) = \binom{n}{k} p^k (1 - p)^{n-k} $$
 ## Statistical distance
 
 ## Algorithmic distinguisher
+
+{% endblock %}
